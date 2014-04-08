@@ -1,0 +1,130 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Ladder Simulation | Ryan Jackson</title>
+		<script type="text/javascript">
+
+			var canvas, ctx;
+			var x, y, a, l;
+			var xArray, yArray, count;
+			var running;
+
+			l = 450;
+
+			function startSim()
+			{
+				if(running)
+				{
+					return;
+				}
+				running = true;
+
+				canvas = document.getElementById("canvas");
+				ctx = canvas.getContext("2d");
+
+				xArray = new Array(70);
+				yArray = new Array(70);
+				count = 0;
+
+				ctx.clearRect(0, 0, 500, 500);
+
+				drawAxes();
+
+				a = Math.PI * 0.45;
+				calcXY();
+
+				drawLadder();
+				drawMan();
+
+				setTimeout("simStep();", 20);
+			}
+
+			function calcXY()
+			{
+				x = l * Math.cos(a);
+				y = l * Math.sin(a);
+			}
+
+			function simStep()
+			{
+				ctx.clearRect(0, 0, 500, 500);
+
+				drawAxes();
+
+				a -= 0.02;
+				calcXY();
+
+				drawPath();
+
+				drawLadder();
+				drawMan();
+
+				if(a >= 0.1)
+				{
+					setTimeout("simStep();", 50);
+				}
+				else
+				{
+					running = false;
+				}
+			}
+
+			function drawPath()
+			{
+				ctx.lineWidth = 2;
+				ctx.strokeStyle = "rgba(0,255,0,255)";
+				ctx.beginPath();
+				ctx.moveTo(xArray[0], yArray[0]);
+				for(var i = 1; i < count; i++)
+				{
+					ctx.lineTo(xArray[i], yArray[i]);
+				}
+				ctx.stroke();
+			}
+
+			function drawAxes()
+			{
+				ctx.lineWidth = 2;
+				ctx.strokeStyle = "rgba(0,0,0,255)";
+				ctx.beginPath();
+				ctx.moveTo(10, 490);
+				ctx.lineTo(490, 490);
+				ctx.lineTo(490, 10);
+				ctx.stroke();
+			}
+
+			function drawLadder()
+			{
+				ctx.lineWidth = 3;
+				ctx.strokeStyle = "rgba(150,75,0,255)";
+				ctx.beginPath();
+				ctx.moveTo(490 - x, 490);
+				ctx.lineTo(490, 490 - y);
+				ctx.stroke();
+			}
+
+			function drawMan()
+			{
+				xPos = (980 - x) / 2;
+				yPos = (980 - y) / 2;
+				ctx.lineWidth = 2;
+				ctx.strokeStyle = "rgba(0,0,0,255)";
+				ctx.fillStyle = "rgba(255,0,0,100)";
+				ctx.beginPath();
+				ctx.arc(xPos, yPos, 10, 0, Math.PI*2, true);
+				ctx.closePath();
+				ctx.fill();
+				ctx.stroke();
+
+				xArray[count] = xPos;
+				yArray[count] = yPos;
+				count++;
+			}
+
+		</script>
+	</head>
+	<body>
+		<button type="button" onClick="startSim();">Run Simulation</button><br />
+		<canvas width="500" height="500" id="canvas"></canvas>
+	</body>
+</html>
